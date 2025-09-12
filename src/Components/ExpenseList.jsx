@@ -10,10 +10,11 @@ function ExpenseList({ transactions }) {
     <div>
       <ul>
         {/* 2. Map over the 'transactions' array */}
+
         {transactions.map((transaction) => (
           <li key={transaction.id}>
-            <span>{transaction.category}: </span>
-            <span>${transaction.amount.toFixed(2)}</span>
+            <span>{transaction.income == 0?  transaction.category:"income"}: </span>
+            <span>${transaction.income == 0? transaction.amount.toFixed(2) : transaction.income}</span>
           </li>
         ))}
       </ul>

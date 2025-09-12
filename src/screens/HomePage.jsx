@@ -9,13 +9,12 @@ function HomePage() {
 
   // 4. Create an async function to get the data
   const fetchTransactions = async () => {
-    const { data, error } = await supabase.from("expenses").select("*"); // Select all columns
+    const { data, error } = await supabase.from("Transactions").select("*"); // Select all columns
 
     if (error) {
       console.error("Error fetching transactions:", error);
     } else {
       setTransactions(data); // Update the state with the fetched data
-      console.log("fetched transactions : ", data);
     }
   };
 

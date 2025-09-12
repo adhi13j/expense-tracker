@@ -1,6 +1,6 @@
 import { Routes, Route, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-
+import "react-datepicker/dist/react-datepicker.css";
 import HomePage from "./screens/HomePage";
 import AnalyticsPage from "./screens/AnalyticsPage";
 import SettingsPage from "./screens/SettingsPage";
