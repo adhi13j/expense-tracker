@@ -117,6 +117,31 @@ function AnalyticsPage() {
   );
   const [endDate, setEndDate] = useState(new Date());
 
+
+  const [aiSuggestion, setAiSuggestion] = useState("");
+  const [isLoadingAi, setIsLoadingAi] = useState(false);
+
+  const getBudgetingTip = async () => {
+    setIsLoadingAi(true);
+    try {
+      // This calls the function you just deployed
+      const { data, error } = await supabase.functions.invoke(
+        "ai-budget-tips",
+        {
+          body: { pieChartData: formattedPieData },
+        }
+      );
+
+      if (error) throw error;
+
+      setAiSuggestion(data.suggestion);
+    } catch (error) {
+      console.error("Error fetching AI suggestion:", error);
+      setAiSuggestion("Could not fetch a suggestion at this time.");
+    }
+    setIsLoadingAi(false);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       const { data: walletData } = await supabase.from("Wallet").select("*");
@@ -264,6 +289,23 @@ function AnalyticsPage() {
         <div style={{ width: "100%", height: 400 }}>
           <CategoryPieChart data={formattedPieData} />
         </div>
+      </div>
+      <div style={{ marginTop: "40px", textAlign: "center" }}>
+        <h3>AI Budgeting Helper</h3>
+        <button onClick={getBudgetingTip} disabled={isLoadingAi}>
+          {isLoadingAi ? "Thinking..." : "Get AI Tip"}
+        </button>
+        {aiSuggestion && (
+          <p
+            style={{
+              marginTop: "10px",
+              fontStyle: "italic",
+              fontSize: "1.1em",
+            }}
+          >
+            <strong>AI Says:</strong> {aiSuggestion}
+          </p>
+        )}
       </div>
     </div>
   );
