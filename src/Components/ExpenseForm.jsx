@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import { useCategories } from "../contexts/CategoryContext";
 
 function ExpenseForm({ onNewTransaction }) {
+   const { categories } = useCategories(); 
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("food");
   const [transactionType, setTransactionType] = useState("expense");
 
+  
   const handleTransactionSubmit = async (event) => {
     event.preventDefault();
 
@@ -39,6 +42,19 @@ function ExpenseForm({ onNewTransaction }) {
   return (
     <div>
       <form onSubmit={handleTransactionSubmit}>
+        {transactionType === "expense" && (
+          // 3. Dynamically create the dropdown options
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.name}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        )}
         <div>
           <label>
             <input
