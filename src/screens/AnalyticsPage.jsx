@@ -4,8 +4,13 @@ import { supabase } from "../lib/supabaseClient";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
-  BarChart,
+  BarChart, // For the daily expenses
   Bar,
+  AreaChart, // For the wallet balance
+  Area,
+  PieChart,
+  Pie,
+  Cell,
   Brush,
   XAxis,
   YAxis,
@@ -15,8 +20,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// (The MyChart and categoryColors components remain exactly the same)
-const MyChart = ({ data, visibleCategories }) => {
+// Chart 1: Daily STACKED BAR chart for expenses
+const DailyExpenseChart = ({ data, visibleCategories }) => {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart
@@ -42,6 +47,59 @@ const MyChart = ({ data, visibleCategories }) => {
   );
 };
 
+// Chart 2: PIE chart for expense category breakdown
+const CategoryPieChart = ({ data }) => {
+  const colors = data.map((entry) => categoryColors[entry.name] || "#8884d8");
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <PieChart>
+        <Pie
+          data={data}
+          cx="50%"
+          cy="50%"
+          labelLine={false}
+          outerRadius={150}
+          fill="#8884d8"
+          dataKey="value"
+          nameKey="name"
+          label={({ name, percent }) =>
+            `${name} ${(percent * 100).toFixed(0)}%`
+          }
+        >
+          {data.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+          ))}
+        </Pie>
+        <Tooltip />
+      </PieChart>
+    </ResponsiveContainer>
+  );
+};
+
+// Chart 3: AREA chart for the net wallet balance
+const NetWalletChart = ({ data }) => {
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <AreaChart
+        data={data}
+        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="date" />
+        <YAxis />
+        <Tooltip />
+        <Brush dataKey="date" height={30} stroke="#82ca9d" />
+        <Area
+          type="monotone"
+          dataKey="balance"
+          stroke="#82ca9d"
+          fill="#82ca9d"
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+};
+
 const categoryColors = {
   food: "#8884d8",
   entertainment: "#82ca9d",
@@ -51,26 +109,31 @@ const categoryColors = {
 
 function AnalyticsPage() {
   const [allTransactions, setAllTransactions] = useState([]);
-  const [chartData, setChartData] = useState([]); // Renamed for clarity
+  const [walletHistory, setWalletHistory] = useState([]);
   const [categories, setCategories] = useState([]);
-
-  // Set default start date to the beginning of the month
+  const [visibleCategories, setVisibleCategories] = useState({});
   const [startDate, setStartDate] = useState(
-    new Date(new Date().getFullYear(), new Date().getMonth(), 2)
+    new Date(new Date().getFullYear(), new Date().getMonth(), 1)
   );
   const [endDate, setEndDate] = useState(new Date());
-  const [visibleCategories, setVisibleCategories] = useState({});
 
   useEffect(() => {
-    const fetchAllData = async () => {
-      const { data, error } = await supabase.from("Transactions").select("*");
-      if (error) {
-        console.error("Error fetching transactions:", error);
-        return;
-      }
-      setAllTransactions(data);
+    const fetchData = async () => {
+      const { data: walletData } = await supabase.from("Wallet").select("*");
+      const { data: transactions } = await supabase
+        .from("Transactions")
+        .select("*");
 
-      const uniqueCategories = [...new Set(data.map((t) => t.category))];
+      setAllTransactions(transactions || []);
+      setWalletHistory(walletData || []);
+
+      const uniqueCategories = [
+        ...new Set(
+          (transactions || [])
+            .filter((t) => t.type === "expense")
+            .map((t) => t.category)
+        ),
+      ];
       setCategories(uniqueCategories);
       let initialVisibility = {};
       uniqueCategories.forEach((cat) => {
@@ -78,49 +141,51 @@ function AnalyticsPage() {
       });
       setVisibleCategories(initialVisibility);
     };
-    fetchAllData();
+
+    fetchData();
   }, []);
 
-  useEffect(() => {
-    if (allTransactions.length === 0 || !startDate || !endDate) return;
+  const toYYYYMMDD = (date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
 
-    // 1. Grouping logic remains the same
-    const groupedByDate = allTransactions.reduce((acc, t) => {
-      if (!visibleCategories[t.category]) return acc;
-      const date = t.date;
-      if (!acc[date]) {
-        acc[date] = { date };
-      }
-      acc[date][t.category] = (acc[date][t.category] || 0) + t.amount;
+  const startString = toYYYYMMDD(startDate);
+  const endString = toYYYYMMDD(endDate);
+
+  const filteredTransactions = allTransactions.filter(
+    (t) => t.date >= startString && t.date <= endString
+  );
+
+  // Data for Chart 1 (Daily Expenses)
+  const dailyExpenseData = filteredTransactions
+    .filter((t) => t.type === "expense")
+    .reduce((acc, t) => {
+      if (!acc[t.date]) acc[t.date] = { date: t.date };
+      acc[t.date][t.category] = (acc[t.date][t.category] || 0) + t.amount;
       return acc;
     }, {});
+  const timelineExpenseData = Object.values(dailyExpenseData);
 
-    // --- NEW, TIMEZONE-SAFE LOGIC ---
+  // Data for Chart 2 (Pie Chart)
+  const pieChartData = filteredTransactions
+    .filter((t) => t.type === "expense")
+    .reduce((acc, t) => {
+      acc[t.category] = (acc[t.category] || 0) + t.amount;
+      return acc;
+    }, {});
+  const formattedPieData = Object.keys(pieChartData).map((key) => ({
+    name: key,
+    value: pieChartData[key],
+  }));
 
-    // 2. Create a complete date range without mutating state
-    let dateRange = [];
-    let currentDate = new Date(startDate);
+  // Data for Chart 3 (Wallet Balance)
+  const walletTimelineData = walletHistory.filter(
+    (d) => d.date >= startString && d.date <= endString
+  );
 
-    while (currentDate <= endDate) {
-      // Manually format the date to avoid timezone issues
-      const year = currentDate.getFullYear();
-      const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-      const day = String(currentDate.getDate()).padStart(2, "0");
-      const formattedDate = `${year}-${month}-${day}`;
-
-      dateRange.push(formattedDate);
-
-      // Safely increment the date of our copy
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-
-    // 3. Merging logic remains the same
-    const finalChartData = dateRange.map((date) => {
-      return groupedByDate[date] || { date };
-    });
-
-    setChartData(finalChartData);
-  }, [allTransactions, startDate, endDate, visibleCategories]);
   const handleCategoryChange = (category) => {
     setVisibleCategories((prev) => ({ ...prev, [category]: !prev[category] }));
   };
@@ -131,15 +196,16 @@ function AnalyticsPage() {
 
   return (
     <div>
-      <h2>Analytics</h2>
+      <h2>Analytics Dashboard</h2>
 
       <div
         style={{
           display: "flex",
           justifyContent: "space-around",
           alignItems: "center",
-          padding: "10px",
+          padding: "20px",
           flexWrap: "wrap",
+          borderBottom: "1px solid #eee",
         }}
       >
         <div>
@@ -162,7 +228,7 @@ function AnalyticsPage() {
           />
         </div>
         <div>
-          <strong>Categories:</strong>
+          <strong>Expense Categories (for Daily Expense Chart):</strong>
           {categories.map((cat) => (
             <label key={cat} style={{ marginRight: "10px" }}>
               <input
@@ -176,9 +242,28 @@ function AnalyticsPage() {
         </div>
       </div>
 
-      <p>Daily spending by category:</p>
-      <div style={{ width: "100%", height: 400 }}>
-        <MyChart data={chartData} visibleCategories={visibleCategoryList} />
+      <div style={{ marginTop: "20px" }}>
+        <h3>Daily Spending by Category</h3>
+        <div style={{ width: "100%", height: 400 }}>
+          <DailyExpenseChart
+            data={timelineExpenseData}
+            visibleCategories={visibleCategoryList}
+          />
+        </div>
+      </div>
+
+      <div style={{ marginTop: "40px" }}>
+        <h3>Net Wallet Balance Over Time</h3>
+        <div style={{ width: "100%", height: 400 }}>
+          <NetWalletChart data={walletTimelineData} />
+        </div>
+      </div>
+
+      <div style={{ marginTop: "40px" }}>
+        <h3>Expense Breakdown by Category</h3>
+        <div style={{ width: "100%", height: 400 }}>
+          <CategoryPieChart data={formattedPieData} />
+        </div>
       </div>
     </div>
   );

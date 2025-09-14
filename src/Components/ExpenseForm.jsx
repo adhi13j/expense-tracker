@@ -1,105 +1,88 @@
 import React, { useState } from "react";
-
 import { supabase } from "../lib/supabaseClient";
 
-function ExpenseForm({ onNewExpense }) {
+function ExpenseForm({ onNewTransaction }) {
   const [amount, setAmount] = useState("");
-  const [income, setIncome] = useState("");
   const [category, setCategory] = useState("food");
-  const handleExpenseSubmit = async (event) => {
+  const [transactionType, setTransactionType] = useState("expense");
+
+  const handleTransactionSubmit = async (event) => {
     event.preventDefault();
 
-    if (!amount) {
-      alert("Please enter an amount.");
+    if (!amount || parseFloat(amount) <= 0) {
+      alert("Please enter a valid amount.");
       return;
     }
 
-    const newExpense = {
-      id: Date.now(),
-      category: category,
-      amount: parseFloat(amount),
-      income : 0,
-      date: new Date().toISOString().slice(0, 10), // Get today's date in YYYY-MM-DD format
+    const newTransaction = {
+      type: transactionType,
+      category: transactionType === "income" ? "income" : category,
+      amount: transactionType === "expense" ? parseFloat(amount) : 0,
+      income: transactionType === "income" ? parseFloat(amount) : 0,
+      date: new Date().toISOString().slice(0, 10),
     };
 
-    const { error } = await supabase.from("Transactions").insert([newExpense]);
+    const { error } = await supabase
+      .from("Transactions")
+      .insert([newTransaction]);
 
     if (error) {
-      // If there was an error, show it to the user
-      alert("Error adding expense: " + error.message);
+      alert("Error adding transaction: " + error.message);
     } else {
-      // If it was successful, clear the form fields
       setAmount("");
       setCategory("food");
-      console.log("Expense added successfully!");
-      onNewExpense();
+      console.log("Transaction added successfully!");
+      onNewTransaction();
     }
   };
-  const handleIncomeSubmit = async (event) => {
-    event.preventDefault();
 
-    if (!income) {
-      alert("Please enter an income.");
-      return;
-    }
-
-    const newIncome = {
-      id: Date.now(),
-      category: category,
-      amount: 0,
-      income : income,
-      date: new Date().toISOString().slice(0, 10), // Get today's date in YYYY-MM-DD format
-    };
-
-    const { error } = await supabase.from("Transactions").insert([newIncome]);
-
-    if (error) {
-      // If there was an error, show it to the user
-      alert("Error adding expense: " + error.message);
-    } else {
-      // If it was successful, clear the form fields
-      setIncome("");
-      console.log("Income added successfully!");
-      onNewExpense();
-    }
-  };
   return (
     <div>
-      <form onSubmit={handleExpenseSubmit}>
-        <select
-          value={category}
-          onChange={(e) => {
-            setCategory(e.target.value);
-          }}
-        >
-          <option value="food">Food</option>
-          <option value="entertainment">entertainment</option>
-          <option value="groceries">groceries</option>
-          <option value="bills">Bills</option>
-        </select>
+      <form onSubmit={handleTransactionSubmit}>
+        <div>
+          <label>
+            <input
+              type="radio"
+              value="expense"
+              checked={transactionType === "expense"}
+              onChange={() => setTransactionType("expense")}
+            />
+            Expense
+          </label>
+          <label style={{ marginLeft: "10px" }}>
+            <input
+              type="radio"
+              value="income"
+              checked={transactionType === "income"}
+              onChange={() => setTransactionType("income")}
+            />
+            Income
+          </label>
+        </div>
+
+        {transactionType === "expense" && (
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="food">Food</option>
+            <option value="entertainment">Entertainment</option>
+            <option value="groceries">Groceries</option>
+            <option value="bills">Bills</option>
+          </select>
+        )}
+
         <input
           type="number"
-          placeholder="0.00"
+          placeholder={
+            transactionType === "expense" ? "Expense Amount" : "Income Amount"
+          }
           value={amount}
-          onChange={(e) => {
-            setAmount(e.target.value);
-          }}
-        ></input>
-        <h2>Add New Expense</h2>
-        <button type="submit">Add Expense</button>
-      </form>
-      <form onSubmit={handleIncomeSubmit}>
-        <h2>Add Income</h2>
-        <input
-          type="number"
-          placeholder="0.00"
-          value={income}
-          onChange={(e) => {
-            setIncome(e.target.value);
-          }}
-        ></input>
+          onChange={(e) => setAmount(e.target.value)}
+        />
+
         <button type="submit">
-          Add Income
+          Add {transactionType === "expense" ? "Expense" : "Income"}
         </button>
       </form>
     </div>
