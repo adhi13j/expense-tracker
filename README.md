@@ -1,14 +1,4 @@
-Of course. A professional `README.md` is essential for any project. It serves as the front door for other developers, recruiters, or anyone interested in your work.
-
-This file includes everything: a project overview, a complete list of features you've built, a setup guide with Supabase configuration, and a "to-do" list for future ideas.
-
------
-
-Just copy and paste this content into a new file named `README.md` in the root of your project folder (`D:\expense-tracker`).
-
-````markdown
 # Expense Tracker AI 💸
-
 An intelligent, full-stack application for tracking personal income and expenses, featuring an AI-powered analytics dashboard. Built with React, Supabase, and Recharts.
 
 ![image](httpshttps://github.com/adhi13j/Expense_Tracker/assets/132141517/fefac614-7d87-46e3-ab77-160a2b721867)
@@ -151,8 +141,3 @@ Your application should now be running on `http://localhost:5173`.
   * [ ] Add password-based authentication alongside Google OAuth.
   * [ ] Implement data import from a CSV file.
   * [ ] Improve mobile responsiveness for a better experience on all devices.
-
-<!-- end list -->
-
-```
-```
