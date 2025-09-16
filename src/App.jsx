@@ -6,6 +6,8 @@ import HomePage from "./screens/HomePage";
 import AnalyticsPage from "./screens/AnalyticsPage";
 import SettingsPage from "./screens/SettingsPage";
 
+import Navbar from "./Components/Navbar";
+
 import { supabase } from "./lib/supabaseClient";
 
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -29,33 +31,18 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider>
+     <ThemeProvider>
       <CategoryProvider>
-        <div>
-          {userdata ? `Logged in as ${userdata.email}` : "Not logged in"}
-          <nav>
-            <ul>
-              <li>
-                <Link to="/">Home</Link>
-              </li>
-              <li>
-                <Link to="/analytics">Analytics</Link>
-              </li>
-              <li>
-                <Link to="/settings">Settings</Link>
-              </li>
-            </ul>
-          </nav>
-          <hr />
-          <main>
+        <div className="bg-slate-100 dark:bg-slate-900 text-zinc-900 dark:text-zinc-200 min-h-screen font-sans">
+          <header className="flex justify-center p-4">
+            <Navbar /> 
+          </header>
+
+          <main className="p-4 sm:p-6 md:p-8">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
-              {/* 3. No need to pass theme props anymore! */}
-              <Route
-                path="/settings"
-                element={<SettingsPage user={userdata} />}
-              />
+              <Route path="/settings" element={<SettingsPage user={userdata} />} />
             </Routes>
           </main>
         </div>
