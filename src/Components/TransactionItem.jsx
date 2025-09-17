@@ -1,6 +1,4 @@
 import React from "react";
-
-// Make sure to accept onEdit as a prop
 function TransactionItem({ transaction, onDelete, onEdit }) {
   const isIncome = transaction.type === "income";
   const amountColor = isIncome ? "text-green-500" : "text-red-500";
@@ -21,13 +19,11 @@ function TransactionItem({ transaction, onDelete, onEdit }) {
         {/* Reduced space for more buttons */}
         <p className={`font-semibold ${amountColor} mr-2`}>
           {" "}
-          {/* Added margin */}
-          {sign} $
+          {sign} ₹
           {isIncome
             ? transaction.income.toFixed(2)
             : transaction.amount.toFixed(2)}
         </p>
-        {/* --- EDIT BUTTON (Added back) --- */}
         <button
           onClick={() => onEdit(transaction)}
           className="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-indigo-500 hover:text-white text-xs font-bold py-1 px-2 rounded"

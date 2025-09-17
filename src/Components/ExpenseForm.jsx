@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useCategories } from "../contexts/CategoryContext";
-
+import { Link } from "react-router-dom";
 function ExpenseForm({ onNewTransaction }) {
   const { categories } = useCategories();
   const [amount, setAmount] = useState("");
@@ -45,14 +45,14 @@ function ExpenseForm({ onNewTransaction }) {
       </h3>
 
       <form onSubmit={handleTransactionSubmit} className="space-y-6">
-        <div className="grid grid-cols-2 gap-2 rounded-full bg-slate-200 dark:bg-slate-700 p-1">
+        <div className="grid grid-cols-2 gap-2 rounded-full bg-slate-200 dark:bg-slate-700 p-1 cursor-pointer">
           <button
             type="button"
             onClick={() => setTransactionType("expense")}
-            className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${
+            className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors cursor-pointer${
               transactionType === "expense"
-                ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
-                : "text-slate-600 dark:text-slate-400"
+                ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 cursor-pointer"
+                : "text-slate-600 dark:text-slate-400 cursor-pointer"
             }`}
           >
             Expense
@@ -60,10 +60,10 @@ function ExpenseForm({ onNewTransaction }) {
           <button
             type="button"
             onClick={() => setTransactionType("income")}
-            className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${
+            className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors cursor-pointer${
               transactionType === "income"
-                ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
-                : "text-slate-600 dark:text-slate-400"
+                ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 cursor-pointer"
+                : "text-slate-600 dark:text-slate-400 cursor-pointer"
             }`}
           >
             Income
@@ -82,13 +82,12 @@ function ExpenseForm({ onNewTransaction }) {
               {categories.length === 0 ? (
                 <p className="mt-2 text-sm text-slate-500">
                   Please{" "}
-                  
-                  <a
-                    href="/settings"
+                  <Link
+                    to="/settings"
                     className="font-semibold text-indigo-600 hover:underline"
                   >
                     add a category
-                  </a>
+                  </Link>{" "}
                   first.
                 </p>
               ) : (
