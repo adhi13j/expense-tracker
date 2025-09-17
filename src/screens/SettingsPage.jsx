@@ -28,7 +28,6 @@ function SettingsPage({ user }) {
   }
 
   return (
-    
     <div className="max-w-3xl mx-auto space-y-8">
       {/* Page Header */}
       <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-200">
@@ -64,7 +63,7 @@ function SettingsPage({ user }) {
       </div>
 
       <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md">
-        <h4 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-4">
+        <h4 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-4 text-center">
           Manage Categories
         </h4>
         <ul className="space-y-2 mb-4 list-disc list-inside text-slate-600 dark:text-slate-400">
@@ -78,7 +77,7 @@ function SettingsPage({ user }) {
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value)}
             placeholder="New category name"
-            className="flex-grow block w-full rounded-md border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            className="flex-grow block w-full rounded-md border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-center"
           />
           <button
             type="submit"
@@ -115,6 +114,11 @@ function SettingsPage({ user }) {
             </button>
           </div>
         )}
+      </div>
+      <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md text-center">
+        <b>Credits</b> <br />
+        Base code by Srivenkata <br />
+        art design by gemini
       </div>
     </div>
   );

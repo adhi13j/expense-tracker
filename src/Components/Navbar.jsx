@@ -22,13 +22,12 @@ function Navbar() {
             `relative z-10 block w-28 text-center px-4 py-2 rounded-full text-sm font-semibold transition-colors
             ${
               isActive
-                ? "text-white" // Active text color
+                ? "text-white" 
                 : "text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100" // Inactive text color
             }`
           }
         >
           {link.name}
-          {/* The magic happens here with Framer Motion's layoutId */}
           {link.path === activeLink && (
             <motion.span
               layoutId="bubble"

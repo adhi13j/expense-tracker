@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 
-// Basic modal styling
 const modalStyles = {
   position: "fixed",
   top: "50%",
@@ -27,7 +26,6 @@ function EditTransactionModal({ transaction, onClose, onSave }) {
   const [category, setCategory] = useState("food");
   const [transactionType, setTransactionType] = useState("expense");
 
-  // When the modal opens, pre-fill the form with the transaction's data
   useEffect(() => {
     if (transaction) {
       setTransactionType(transaction.type);
@@ -57,7 +55,6 @@ function EditTransactionModal({ transaction, onClose, onSave }) {
       <div style={overlayStyles} onClick={onClose} />
       <div style={modalStyles}>
         <h2>Edit Transaction</h2>
-        <div>{/* Radio buttons to switch between expense and income */}</div>
         {transactionType === "expense" && (
           <select
             value={category}

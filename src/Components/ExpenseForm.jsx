@@ -40,7 +40,7 @@ function ExpenseForm({ onNewTransaction }) {
 
   return (
     <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg">
-      <h3 className="text-xl font-bold text-zinc-800 dark:text-zinc-200 mb-6">
+      <h3 className="text-xl font-bold text-zinc-800 dark:text-zinc-200 mb-6 text-center">
         Add New Transaction
       </h3>
 
@@ -109,7 +109,7 @@ function ExpenseForm({ onNewTransaction }) {
           <div className="flex-1">
             <label
               htmlFor="amount"
-              className="block text-sm font-medium text-slate-600 dark:text-slate-400"
+              className="block text-sm font-medium text-slate-600 dark:text-slate-400 text-center"
             >
               Amount
             </label>
@@ -119,7 +119,7 @@ function ExpenseForm({ onNewTransaction }) {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              className="mt-1 block w-full rounded-md border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block text-center w-full rounded-md border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
           </div>
         </div>

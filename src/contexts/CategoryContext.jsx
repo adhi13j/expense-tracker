@@ -3,7 +3,6 @@ import { supabase } from "../lib/supabaseClient";
 
 const CategoryContext = createContext();
 
-// Create a provider component
 export function CategoryProvider({ children }) {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);

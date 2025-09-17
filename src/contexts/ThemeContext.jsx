@@ -1,13 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-// Create a context
 const ThemeContext = createContext();
 
-// Create a provider component
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState("light"); // Correctly initialize as a string
-
-  // This effect applies the theme to the whole app
+  const [theme, setTheme] = useState("light"); 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
@@ -19,7 +15,6 @@ export function ThemeProvider({ children }) {
   );
 }
 
-// Create a custom hook to use the theme context easily
 export function useTheme() {
   return useContext(ThemeContext);
 }

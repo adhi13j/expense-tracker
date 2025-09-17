@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
 
-// Import the new components
 import ExpenseForm from "../Components/ExpenseForm";
 import WalletBalance from "../Components/WalletBalance";
 import TransactionItem from "../Components/TransactionItem";
@@ -32,15 +31,14 @@ function HomePage() {
   };
 
   const fetchTransactions = async () => {
-    // Fetch transactions from the last 30 days for performance
-    const thirtyDaysAgo = new Date(
+    const Day_inPast = new Date(
       Date.now() - 30 * 24 * 60 * 60 * 1000
     ).toISOString();
 
     const { data, error } = await supabase
       .from("Transactions")
       .select("*")
-      .gte("date", thirtyDaysAgo) // gte means 'greater than or equal to'
+      .gte("date", Day_inPast) 
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -55,7 +53,6 @@ function HomePage() {
     fetchBalance();
   }, []);
 
-  // --- Handler Functions ---
   const handleNewTransaction = () => {
     fetchTransactions();
     fetchBalance();
@@ -96,16 +93,13 @@ function HomePage() {
     }
   };
 
-  // --- Filtering for Today's Transactions ---
   const today = new Date().toISOString().slice(0, 10);
   const todaysTransactions = transactions.filter(
     (transaction) => transaction.date === today
   );
 
   return (
-    // Main layout grid: 2 columns on medium screens and up, 1 column on small screens
     <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-      {/* --- LEFT COLUMN (main content) --- */}
       <div className="md:col-span-2 space-y-8">
         <ExpenseForm onNewTransaction={handleNewTransaction} />
 
@@ -119,7 +113,7 @@ function HomePage() {
                 <TransactionItem
                   key={transaction.id}
                   transaction={transaction}
-                  onEdit={handleEdit} // Pass the handleEdit function
+                  onEdit={handleEdit}
                   onDelete={handleDelete}
                 />
               ))
@@ -132,12 +126,10 @@ function HomePage() {
         </div>
       </div>
 
-      {/* --- RIGHT COLUMN (sidebar) --- */}
       <div className="md:col-span-1">
         <WalletBalance balance={balance} />
       </div>
 
-      {/* --- MODAL (not part of the grid) --- */}
       {isModalOpen && (
         <EditTransactionModal
           transaction={editingTransaction}

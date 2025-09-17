@@ -16,7 +16,6 @@ function TransactionItem({ transaction, onDelete, onEdit }) {
       </div>
       <div className="flex items-center space-x-2">
         {" "}
-        {/* Reduced space for more buttons */}
         <p className={`font-semibold ${amountColor} mr-2`}>
           {" "}
           {sign} ₹
